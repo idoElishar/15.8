@@ -1,5 +1,6 @@
 import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
+import bcrypt from 'bcrypt';
 
 const app = express();
 const port = 3000;
@@ -92,6 +93,22 @@ app.post('/checkUser', (req, res) => {
 });
 
 
+app.post('/users/:email', async (req, res) => {
+    const userEmail = req.params.email;
+    const userIndex = arr.findIndex(item => item.email === userEmail);
+    
+    if (userIndex === -1) {
+        const { email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10); // Hashing password with bcrypt
+        const newUser = { email, passwordHash: hashedPassword };
+        arr.push(newUser);
+        res.send('User registered');
+    } else {
+        res.send('User already exists');
+    }
+});
+
+
 // PUT request to root
 app.put('/', (req, res) => {
     // Your PUT logic here
@@ -107,9 +124,4 @@ app.listen(port, () => {
     console.log(`Server is up and running on port:${port}`);
 });
 
-git init
-git add .
-git commit -m "first commit"
-git branch -M main
-git remote add origin https://github.com/idoElishar/15.8.git
-git push -u origin main
+
